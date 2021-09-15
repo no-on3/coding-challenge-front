@@ -4,18 +4,27 @@ import ProductDTO from '~/models/Product'
 
 export const state = () => ({
   productsList: [] as ProductDTO[],
+  searchQuery : '' as string
 })
 
 export type RootState = ReturnType<typeof state>
 
 export const getters: GetterTree<RootState, RootState> = {
     productsList: state => state.productsList,
+    searchQuery : state => state.searchQuery,
 }
 export const mutations: MutationTree<RootState> = {
     FETCH_PRODUCTS: (state, products : ProductDTO[]) => (state.productsList = products),
   }
 export const actions: ActionTree<RootState, RootState> = {
 
+    search ({commit,rootState},payload) {
+
+        console.log({payload})
+        console.log({rootState})
+
+
+    },
 
    fetchProducts({ commit }) {
     const products = [{

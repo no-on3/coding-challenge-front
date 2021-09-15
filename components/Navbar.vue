@@ -14,6 +14,10 @@
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+   
+    <price-range-slider 
+    :track-height="0.2"
+    />
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="ml-auto">
           <form class="searchForm" @submit.prevent="submitSearch">
@@ -38,19 +42,26 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import PriceRangeSlider from './PriceRangeSlider.vue'
 
-@Component
+@Component({
+  components: {
+    PriceRangeSlider
+  },
+})
 export default class Navbar extends Vue {
+  searchQuery: string = ''
+  min = 0
+  max = 250
+  enableCross = false
+  value = ''
+  removeSearchQuery() {
+    this.searchQuery = ''
+  }
 
-    searchQuery : string = ''
-
-    removeSearchQuery() {
-      this.searchQuery = '';
-    }
-
-    submitSearch() {
-        
-    }
+  submitSearch() {
+    this.$store.dispatch('search', this.searchQuery)
+  }
 
   mounted() {}
 }
