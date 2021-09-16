@@ -216,7 +216,7 @@ export default {
   right: 0;
 }
 .track-container {
-  width: 50%;
+  width: 100%;
   position: relative;
   cursor: pointer;
   height: 0.5rem;
