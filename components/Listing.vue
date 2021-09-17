@@ -1,18 +1,13 @@
 <!-- Please remove this file from your project -->
 <template>
-  <b-container fluid>
-    <b-row>
-      <b-col v-for="(product, index) in productsList" :key="index" col lg="4">
-        <div class="w-100 p-1">
-          <Product
-            :description="`${product.description}`"
-            :category="product.category"
-            class="w-full h-full"
-          />
-        </div>
-      </b-col>
-    </b-row>
-  </b-container>
+  <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
+    <div class="w-full h-full" v-for="(product, index) in productsList" :key="index">
+      <product-card :name="product.name"
+        :description="product.description"
+        :category="product.category">
+      </product-card>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,7 +18,7 @@ import { getters } from '~/store'
 
 @Component({
   components: {
-    Product,
+    'product-card' : Product,
   },
 })
 export default class Listing extends Vue {

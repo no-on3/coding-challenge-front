@@ -1,11 +1,11 @@
 <template>
-  <div class="track-container">
-    <span class="range-value min">{{ minValue }} </span>
-    <span class="range-value max">{{ maxValue }}</span>
-    <div ref="_vpcTrack" class="track"></div>
-    <div ref="trackHighlight" class="track-highlight"></div>
-    <button ref="track1" class="track-btn track1"></button>
-    <button ref="track2" class="track-btn track2"></button>
+<div class="track-container">
+    <span class="range-value min"><span class="uppercase text-sm text-gray-300">Min:</span> {{ minValue }} </span>
+    <span class="range-value max"><span class="uppercase text-sm text-gray-300">Max:</span> {{ maxValue }}</span>
+    <div ref="_vpcTrack" class="track bg-gray-300"></div>
+    <div ref="trackHighlight" class="track-highlight absolute h-2 rounded-full w-0"></div>
+    <button ref="track1" class="absolute track-btn track1 h-4 flex items-center justify-center w-4 rounded-full bg-blue shadow border border-gray-300 -ml-2 top-0 cursor-pointer"></button>
+    <button ref="track2" class="absolute track-btn track2 h-4 flex items-center justify-center w-4 rounded-full bg-blue shadow border border-gray-300 -ml-2 top-0 cursor-pointer"></button>
   </div>
 </template>
 
@@ -57,7 +57,7 @@ export default {
     document.querySelector('.track1').style.left =
       this.valueToPercent(this.minValue) + '%'
     // track2 initial position
-    document.querySelector('.track2').style.left =
+    document.querySelector('.track2').style.right =
       this.valueToPercent(this.maxValue) + '%'
     // set initila track highlight
     this.setTrackHightlight()
@@ -216,7 +216,7 @@ export default {
   right: 0;
 }
 .track-container {
-  width: 100%;
+  width: 300px;
   position: relative;
   cursor: pointer;
   height: 0.5rem;
@@ -231,11 +231,11 @@ export default {
 }
 
 .track {
-  background-color: #ddd;
+  background-color: #cacaca;
 }
 
 .track-highlight {
-  background-color: black;
+  background-color: rgb(37, 99, 235);
   z-index: 2;
 }
 
@@ -248,12 +248,11 @@ export default {
   display: block;
   position: absolute;
   z-index: 2;
-  width: 1.5rem;
-  height: 1.5rem;
-  top: calc(-50% - 0.25rem);
-  margin-left: -1rem;
+  width: 1rem;
+  height: 1rem;
+  top: calc(-50%);
   border: none;
-  background-color: black;
+  background-color: rgba(37, 99, 233);
   -ms-touch-action: pan-x;
   touch-action: pan-x;
   transition: box-shadow 0.3s ease-out, background-color 0.3s ease,
