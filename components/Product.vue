@@ -21,7 +21,7 @@ export default class Product extends Vue {
   @Prop({ required: true })
   readonly description!: string
 
-  @Prop({ required: true, default: {}, type: Object })
+  @Prop({ required: true, default: '', type: String })
   readonly name!: string
 
   @Prop({ required: true, default: {}, type: Object })

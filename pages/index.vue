@@ -30,12 +30,18 @@
             <nav aria-label="product-filter" class="border-b-2 border-indigo-100">
               <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                  <price-range />
+                  <price-range  :default-min="0" :default-max="1000" />
                 </div>
                 <div>
                   <form class="w-full max-w-sm">
                     <div class="flex items-center">
-                      <input class="bg-gray-100 appearance-none border-2 border-gray-100 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500" type="text" placeholder="Jane Doe" aria-label="Full name">
+                      <input 
+                      
+                               v-model="searchQuery"
+              type="text"
+              placeholder="Type here"
+              class="bg-gray-100 appearance-none border-2 border-gray-100 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                       aria-label="Full name" @keyup="submitSearch">
                     </div>
                   </form>
                 </div>
@@ -63,6 +69,22 @@ export default {
     'all-product-list' : Listing,
     'price-range' : PriceRangeSlider
   },
+
+
+  data(){
+    return { 
+      searchQuery : ''
+    } 
+    },
+
+
+methods: {
+  submitSearch(){
+
+    console.log(this.searchQuery)
+  }
+}
+
 }
 </script>
 </style>

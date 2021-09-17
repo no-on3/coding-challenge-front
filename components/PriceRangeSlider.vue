@@ -1,64 +1,202 @@
 <template>
-<div class="track-container">
-    <span class="range-value min"><span class="uppercase text-sm text-gray-300">Min:</span> {{ minValue }} </span>
-    <span class="range-value max"><span class="uppercase text-sm text-gray-300">Max:</span> {{ maxValue }}</span>
+  <div class="track-container">
+    <span class="range-value min"
+      ><span class="uppercase text-sm text-gray-300">Min:</span> {{ minValue }}
+    </span>
+    <span class="range-value max"
+      ><span class="uppercase text-sm text-gray-300">Max:</span>
+      {{ maxValue }}</span
+    >
     <div ref="_vpcTrack" class="track bg-gray-300"></div>
-    <div ref="trackHighlight" class="track-highlight absolute h-2 rounded-full w-0"></div>
-    <button ref="track1" class="absolute track-btn track1 h-4 flex items-center justify-center w-4 rounded-full bg-blue shadow border border-gray-300 -ml-2 top-0 cursor-pointer"></button>
-    <button ref="track2" class="absolute track-btn track2 h-4 flex items-center justify-center w-4 rounded-full bg-blue shadow border border-gray-300 -ml-2 top-0 cursor-pointer"></button>
+    <div
+      ref="trackHighlight"
+      class="track-highlight absolute h-2 rounded-full w-0"
+    ></div>
+    <button
+      ref="track1"
+      class="
+        absolute
+        track-btn
+        track1
+        h-4
+        flex
+        items-center
+        justify-center
+        w-4
+        rounded-full
+        bg-blue
+        shadow
+        border border-gray-300
+        -ml-2
+        top-0
+        cursor-pointer
+      "
+    ></button>
+    <button
+      ref="track2"
+      class="
+        absolute
+        track-btn
+        track2
+        h-4
+        flex
+        items-center
+        justify-center
+        w-4
+        rounded-full
+        bg-blue
+        shadow
+        border border-gray-300
+        -ml-2
+        top-0
+        cursor-pointer
+      "
+    ></button>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'PriceRangeSlider',
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
-  props: {
-    trackHeight: {
-      type: Number,
-      default: 1,
-    },
-    min: {
-      type: Number,
-      default: 0,
-    },
-    max: {
-      type: Number,
-      default: 10000,
-    },
-  },
+type fn = (_ev: Event, track: string) => void
 
-  data() {
-    return {
-    //   min: 0,
-    //   max: 210,
-      minValue: 50,
-      maxValue: 5000,
-      step: 5,
-      totalSteps: 0,
-      percentPerStep: 1,
-      trackWidth: null,
-      isDragging: false,
-      pos: {
-        curTrack: null,
-      },
+@Component
+export default class PriceRangeSlider extends Vue {
+  @Prop()
+  defaultMin: number = 0
+
+  @Prop()
+  defaultMax: number = 10000
+
+
+
+  minValue = this.$props.defaultMin
+  maxValue = this.$props.defaultMax
+  min = this.$props.defaultMin
+  max = this.$props.defaultMax
+  step = 5
+  totalSteps = 0
+  percentPerStep = 1
+  trackWidth = null
+  isDragging = false
+  pos = {
+    curTrack: '',
+  }
+
+  moveTrack(track: string, ev: Touch) {
+    const percentInPx = this.getPercentInPx()
+
+    const trackX = Math.round(
+      (this.$refs?._vpcTrack as HTMLElement)?.getBoundingClientRect().left
+    )
+    const clientX = ev.clientX
+    const moveDiff = clientX - trackX
+    const moveInPct = moveDiff / percentInPx
+    if (moveInPct < 1 || moveInPct > 100) return
+    const value =
+      Math.round(moveInPct / this.percentPerStep) * this.step + this.min
+    if (track === 'track1') {
+      if (value >= this.maxValue - this.step) return
+      this.minValue = value
     }
-  },
+
+    if (track === 'track2') {
+      if (value <= this.minValue + this.step) return
+      this.maxValue = value
+    }
+
+    ;(this.$refs[track] as HTMLElement).style.left = moveInPct + '%'
+
+    console.log({min : this.minValue, max : this.maxValue})
+    this.setTrackHightlight()
+    this.$store.dispatch('setFilter',{min : this.minValue, max : this.maxValue})
+
+  }
+
+  mousedown: fn = (_ev, track) => {
+    if (this.isDragging) return
+    this.isDragging = true
+    this.pos.curTrack = track
+  }
+
+  touchstart: fn = (ev, track) => {
+    this.mousedown(ev, track)
+  }
+
+  mouseup: fn = (_ev, _track) => {
+    if (!this.isDragging) return
+    this.isDragging = false
+  }
+
+  touchend: fn = (ev, track) => {
+    this.mouseup(ev, track)
+  }
+
+  mousemove = (ev: Touch, track: string) => {
+    if (!this.isDragging) return
+    this.moveTrack(track, ev)
+  }
+
+  touchmove = (ev: TouchEvent, track: string) => {
+    console.log({ ev, track })
+    this.mousemove(ev.changedTouches[0], track)
+  }
+
+  valueToPercent(value) {
+    return ((value - this.min) / this.step) * this.percentPerStep
+  }
+
+  setTrackHightlight() {
+    (this.$refs.trackHighlight as HTMLElement).style.left =
+      String(this.valueToPercent(this.minValue)) + '%';
+    (this.$refs.trackHighlight as HTMLElement).style.width =
+      this.valueToPercent(this.maxValue) -
+      this.valueToPercent(this.minValue) +
+      '%';
+  }
+
+  getPercentInPx() {
+    const trackWidth = (this.$refs._vpcTrack as HTMLElement).offsetWidth
+    const oneStepInPx = trackWidth / this.totalSteps
+    // 1 percent in px
+    const percentInPx = oneStepInPx / this.percentPerStep
+    return percentInPx
+  }
+
+  setClickMove(ev: Touch) {
+    const track1Left = (
+      this.$refs.track1 as HTMLElement
+    ).getBoundingClientRect().left
+    const track2Left = (
+      this.$refs.track2 as HTMLElement
+    ).getBoundingClientRect().left
+    // console.log('track1Left', track1Left)
+    if (ev.clientX < track1Left) {
+      this.moveTrack('track1', ev)
+    } else if (ev.clientX - track1Left < track2Left - ev.clientX) {
+      this.moveTrack('track1', ev)
+    } else {
+      this.moveTrack('track2', ev)
+    }
+  }
 
   mounted() {
+
+
+
+
+
     // calc per step value
     this.totalSteps = (this.max - this.min) / this.step
 
     // percent the track button to be moved on each step
-    this.percentPerStep = 100 / this.totalSteps
-    // console.log('percentPerStep', this.percentPerStep)
-
+    this.percentPerStep = 100 / this.totalSteps;
     // set track1 initilal
-    document.querySelector('.track1').style.left =
-      this.valueToPercent(this.minValue) + '%'
+    (document.querySelector('.track1') as HTMLElement).style.left =
+      this.valueToPercent(this.minValue) + '%';
     // track2 initial position
-    document.querySelector('.track2').style.right =
-      this.valueToPercent(this.maxValue) + '%'
+    (document.querySelector('.track2') as HTMLElement).style.left =
+      this.valueToPercent(this.maxValue) + '%';
     // set initila track highlight
     this.setTrackHightlight()
 
@@ -72,7 +210,6 @@ export default {
         }
       })
     })
-
     ;[
       'mousedown',
       'mouseup',
@@ -106,100 +243,7 @@ export default {
         ev.stopPropagation()
         self.setClickMove(ev)
       })
-  },
-
-  methods: {
-    moveTrack(track, ev) {
-      const percentInPx = this.getPercentInPx()
-
-      const trackX = Math.round(
-        this.$refs._vpcTrack.getBoundingClientRect().left
-      )
-      const clientX = ev.clientX
-      const moveDiff = clientX - trackX
-
-      const moveInPct = moveDiff / percentInPx
-      // console.log(moveInPct)
-
-      if (moveInPct < 1 || moveInPct > 100) return
-      const value =
-        Math.round(moveInPct / this.percentPerStep) * this.step + this.min
-      if (track === 'track1') {
-        if (value >= this.maxValue - this.step) return
-        this.minValue = value
-      }
-
-      if (track === 'track2') {
-        if (value <= this.minValue + this.step) return
-        this.maxValue = value
-      }
-
-      this.$refs[track].style.left = moveInPct + '%'
-      this.setTrackHightlight()
-    },
-    mousedown(_ev, track) {
-      if (this.isDragging) return
-      this.isDragging = true
-      this.pos.curTrack = track
-    },
-
-    touchstart(ev, track) {
-      this.mousedown(ev, track)
-    },
-
-    mouseup(_ev, _track) {
-      if (!this.isDragging) return
-      this.isDragging = false
-    },
-
-    touchend(ev, track) {
-      this.mouseup(ev, track)
-    },
-
-    mousemove(ev, track) {
-      if (!this.isDragging) return
-      this.moveTrack(track, ev)
-    },
-
-    touchmove(ev, track) {
-      this.mousemove(ev.changedTouches[0], track)
-    },
-
-    valueToPercent(value) {
-      return ((value - this.min) / this.step) * this.percentPerStep
-    },
-
-    setTrackHightlight() {
-      this.$refs.trackHighlight.style.left =
-        this.valueToPercent(this.minValue) + '%'
-      this.$refs.trackHighlight.style.width =
-        this.valueToPercent(this.maxValue) -
-        this.valueToPercent(this.minValue) +
-        '%'
-    },
-
-    getPercentInPx() {
-      const trackWidth = this.$refs._vpcTrack.offsetWidth
-      const oneStepInPx = trackWidth / this.totalSteps
-      // 1 percent in px
-      const percentInPx = oneStepInPx / this.percentPerStep
-
-      return percentInPx
-    },
-
-    setClickMove(ev) {
-      const track1Left = this.$refs.track1.getBoundingClientRect().left
-      const track2Left = this.$refs.track2.getBoundingClientRect().left
-      // console.log('track1Left', track1Left)
-      if (ev.clientX < track1Left) {
-        this.moveTrack('track1', ev)
-      } else if (ev.clientX - track1Left < track2Left - ev.clientX) {
-        this.moveTrack('track1', ev)
-      } else {
-        this.moveTrack('track2', ev)
-      }
-    },
-  },
+  }
 }
 </script>
 
