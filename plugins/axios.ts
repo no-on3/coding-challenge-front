@@ -10,7 +10,7 @@ const axiosPlugin: Plugin = ({ $axios }, inject) => {
     }
   })
 
-  inject('axiosInstance', axiosInstance)
+  inject('axios', axiosInstance)
 }
 
 export default axiosPlugin

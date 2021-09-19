@@ -109,7 +109,7 @@ export default class PriceRangeSlider extends Vue {
 
     console.log({min : this.minValue, max : this.maxValue})
     this.setTrackHightlight()
-    this.$store.dispatch('setFilter',{min : this.minValue, max : this.maxValue})
+     this.$emit('set-filter',  {min : this.minValue, max : this.maxValue})
 
   }
 
