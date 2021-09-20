@@ -17,7 +17,7 @@ interface SearchFilters {
 export const state = () => ({
   productsList: [] as ProductDTO[],
   categoriesList: [] as CategoryDTO[],
-  searchQuery: '' as string,
+  isAvailable: true as boolean,
   filters: { price: { min: 0, max: 100 } } as SearchFilters
 })
 
@@ -25,7 +25,7 @@ export type RootState = ReturnType<typeof state>
 
 export const getters: GetterTree<RootState, RootState> = {
   productsList: (state) => state.productsList,
-  searchQuery: (state) => state.searchQuery,
+  searchQuery: (state) => state.isAvailable,
   filters: (state) => state.filters
 }
 export const mutations: MutationTree<RootState> = {
@@ -61,5 +61,13 @@ export const actions: ActionTree<RootState, RootState> = {
     const filters = { ...payload }
     commit('SET_FILTERS', filters)
   },
-  submitSearch({ commit }) {}
+  submitSearch({ commit, rootState },payload) {
+
+    const {category, isAvailable, price : {min , max } } = payload
+    
+
+
+
+
+  }
 }
